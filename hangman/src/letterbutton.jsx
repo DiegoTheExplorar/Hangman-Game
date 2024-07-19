@@ -1,12 +1,17 @@
-import React, { useState } from "react";
-
-function Letter({ letter, onClick }) { // Changed onClicks to onClick
+import React, { useEffect, useState } from "react";
+function Letter({ letter, onClick,reset }) { 
     const [show, setShow] = useState(true);
+
+    useEffect(() => {
+        if (reset) {
+            setShow(true);
+        }
+    }, [reset]);
 
     const handleClick = () => {
         setShow(false);
         if (onClick) {
-            onClick(letter); // Call onClick prop when button is clicked
+            onClick(letter); 
         }
     };
 

@@ -1,15 +1,15 @@
 import React from "react";
-import './keyboard.css'; // Import the CSS file
+import './keyboard.css';
 import Letter from "./letterbutton";
 
-function Keyboard({ onLetterClick }) {
+function Keyboard({ onLetterClick ,reset}) {
     const first_row = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
     const second_row = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
     const third_row = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
 
     const renderRow = (row) => {
         return row.map(val => (
-            <Letter key={val} letter={val} onClick={onLetterClick} />
+            <Letter key={val} letter={val} onClick={onLetterClick} reset={reset}/>
         ));
     };
 
