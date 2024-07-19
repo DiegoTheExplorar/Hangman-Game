@@ -4,12 +4,23 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
+  text-align: center; /* Ensure text alignment is centered */
+  background-color: #f9f9f9; /* Optional: light background color for better contrast */
 }
 
 .image {
+  width: 200px; /* Set a consistent width for all images */
+  height: auto; /* Maintain aspect ratio */
   margin-bottom: 20px;
+  object-fit: cover; /* Ensure images cover the assigned space without distortion */
 }
 
 .modal-content {
   text-align: center;
+  max-width: 80%; /* Limit the width of the modal content */
+  margin: 0 auto; /* Center the modal content horizontally */
+  padding: 20px; /* Add padding for better spacing */
+  border-radius: 10px; /* Rounded corners for modal */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for modal */
 }
+
