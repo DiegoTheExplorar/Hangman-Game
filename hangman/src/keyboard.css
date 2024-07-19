@@ -1,0 +1,19 @@
+.keyboard {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    position: absolute; /* Use absolute positioning */
+    bottom: 0; /* Align the bottom of the container */
+    left: 50%; /* Center horizontally */
+    transform: translateX(-50%); /* Adjust to center */
+}
+
+.row {
+    display: flex;
+    justify-content: center;
+}
+
+.letter-button {
+    margin: 2px;
+    padding: 10px;
+}
