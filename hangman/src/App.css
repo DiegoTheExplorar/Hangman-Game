@@ -4,15 +4,17 @@
   justify-content: center;
   align-items: center;
   height: 100vh;
-  text-align: center; /* Ensure text alignment is centered */
-  background-color: #f9f9f9; /* Optional: light background color for better contrast */
+  text-align: center;
+  background-color: #e9ecef; /* Light background color for better contrast */
+  font-family: 'Arial', sans-serif; /* Add a clean, modern font */
 }
 
 .image {
   width: 200px; /* Set a consistent width for all images */
-  height: auto; /* Maintain aspect ratio */
+  height: 200px; /* Set a consistent height for all images */
   margin-bottom: 20px;
   object-fit: cover; /* Ensure images cover the assigned space without distortion */
+  border-radius: 10px; /* Optional: add rounded corners for images */
 }
 
 .modal-content {
@@ -22,5 +24,5 @@
   padding: 20px; /* Add padding for better spacing */
   border-radius: 10px; /* Rounded corners for modal */
   box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Optional shadow for modal */
+  background-color: white; /* Ensure modal background is white */
 }
-

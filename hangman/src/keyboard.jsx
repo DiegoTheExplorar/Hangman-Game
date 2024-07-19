@@ -1,25 +1,40 @@
-import React from "react";
-import './keyboard.css';
-import Letter from "./letterbutton";
+import React, { forwardRef, useImperativeHandle, useState } from "react";
+import './Keyboard.css';
+import Letter from "./Letter";
 
-function Keyboard({ onLetterClick ,reset}) {
-    const first_row = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
-    const second_row = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
-    const third_row = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
+const Keyboard = forwardRef(({ onLetterClick }, ref) => {
+  const [usedLetters, setUsedLetters] = useState([]);
 
-    const renderRow = (row) => {
-        return row.map(val => (
-            <Letter key={val} letter={val} onClick={onLetterClick} reset={reset}/>
-        ));
-    };
+  useImperativeHandle(ref, () => ({
+    resetKeyboard() {
+      setUsedLetters([]);
+    }
+  }));
 
-    return (
-        <div className="keyboard">
-            <div className="row">{renderRow(first_row)}</div>
-            <div className="row">{renderRow(second_row)}</div>
-            <div className="row">{renderRow(third_row)}</div>
-        </div>
-    );
-}
+  const handleLetterClick = (letter) => {
+    if (!usedLetters.includes(letter)) {
+      setUsedLetters([...usedLetters, letter]);
+      onLetterClick(letter);
+    }
+  };
+
+  const firstRow = ['Q', 'W', 'E', 'R', 'T', 'Y', 'U', 'I', 'O', 'P'];
+  const secondRow = ['A', 'S', 'D', 'F', 'G', 'H', 'J', 'K', 'L'];
+  const thirdRow = ['Z', 'X', 'C', 'V', 'B', 'N', 'M'];
+
+  const renderRow = (row) => {
+    return row.map(val => (
+      <Letter key={val} letter={val} onClick={handleLetterClick} disabled={usedLetters.includes(val)} />
+    ));
+  };
+
+  return (
+    <div className="keyboard">
+      <div className="row">{renderRow(firstRow)}</div>
+      <div className="row">{renderRow(secondRow)}</div>
+      <div className="row">{renderRow(thirdRow)}</div>
+    </div>
+  );
+});
 
 export default Keyboard;

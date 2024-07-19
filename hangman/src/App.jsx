@@ -1,165 +1,69 @@
-import { useEffect, useState } from 'react';
+import { useRef, useState } from 'react';
 import './App.css';
 import CharacterBoxes from './Box';
-import Keyboard from './keyboard';
+import Keyboard from './Keyboard';
 import Modal from './Modal';
+
 const words = [
-  "APPLE",
-  "BANANA",
-  "CHERRY",
-  "DATE",
-  "ELDERBERRY",
-  "FIG",
-  "GRAPE",
-  "HONEYDEW",
-  "ITALIAN",
-  "JUJUBE",
-  "KIWI",
-  "LEMON",
-  "MANGO",
-  "NECTARINE",
-  "ORANGE",
-  "PAPAYA",
-  "QUINCE",
-  "RASPBERRY",
-  "STRAWBERRY",
-  "TANGERINE",
-  "UGLI",
-  "VANILLA",
-  "WATERMELON",
-  "XIGUA",
-  "YUZU",
-  "ZUCCHINI",
-  "AVOCADO",
-  "BLACKBERRY",
-  "BLUEBERRY",
-  "CANTALOUPE",
-  "COCONUT",
-  "CRANBERRY",
-  "CLEMENTINE",
-  "DRAGONFRUIT",
-  "ELDERFLOWER",
-  "GOOSEBERRY",
-  "GRAPEFRUIT",
-  "GUAVA",
-  "JACKFRUIT",
-  "KUMQUAT",
-  "LIME",
-  "LYCHEE",
-  "MANDARIN",
-  "MULBERRY",
-  "OLIVE",
-  "PASSIONFRUIT",
-  "PEACH",
-  "PEAR",
-  "PINEAPPLE","PLUM"]
+  "APPLE", "BANANA", "CHERRY", "DATE", "ELDERBERRY", "FIG", "GRAPE", "HONEYDEW",
+  "ITALIAN", "JUJUBE", "KIWI", "LEMON", "MANGO", "NECTARINE", "ORANGE", "PAPAYA",
+  "QUINCE", "RASPBERRY", "STRAWBERRY", "TANGERINE", "UGLI", "VANILLA", "WATERMELON",
+  "XIGUA", "YUZU", "ZUCCHINI", "AVOCADO", "BLACKBERRY", "BLUEBERRY", "CANTALOUPE",
+  "COCONUT", "CRANBERRY", "CLEMENTINE", "DRAGONFRUIT", "ELDERFLOWER", "GOOSEBERRY",
+  "GRAPEFRUIT", "GUAVA", "JACKFRUIT", "KUMQUAT", "LIME", "LYCHEE", "MANDARIN",
+  "MULBERRY", "OLIVE", "PASSIONFRUIT", "PEACH", "PEAR", "PINEAPPLE", "PLUM"
+];
+
 function App() {
-  const randomIndex = Math.floor(Math.random() * words.length);
-  const initialWord = words[randomIndex];
-  const [word, setWord] = useState(initialWord);
+  const [word, setWord] = useState(words[Math.floor(Math.random() * words.length)]);
   const [tries, setTries] = useState(0);
   const [modal, showModal] = useState(false);
   const [win, setWin] = useState(false);
-  const [clickedLetter, setLetter] = useState('');
-  const [wordArray, setWordArray] = useState([]);
-  const [indexArray, setIndexArray] = useState([]);
-  const [displayWord, setDisplayWord] = useState([]);
-  const [reset, setReset] = useState(false);
-
-  useEffect(() => {
-    setWordArray(word.split(''));
-    setDisplayWord(Array(word.length).fill('_'));
-  }, [word]);
-
-
-  useEffect(() => {
-    if (tries >= 7) {
-      showModal(true);
-    }
-  }, [tries]);
-
-  useEffect(() => {
-    if (win) {
-      showModal(true);
-    }
-  }, [win]);
+  const [wordArray, setWordArray] = useState(word.split(''));
+  const [displayWord, setDisplayWord] = useState(Array(word.length).fill('_'));
+  const keyboardRef = useRef(null);
 
   const handleLetterClick = (letter) => {
-    setLetter(letter);
-    console.log(letter);
-
     if (!wordArray.includes(letter)) {
-      setTries((prevTries) => prevTries + 1);
+      setTries(prevTries => prevTries + 1);
+      if (tries + 1 >= 7) {
+        showModal(true);
+      }
     } else {
-      checkLetter(letter);
-    }
-  };
-
-  const checkLetter = (letter) => {
-    setIndexArray((prevIndexArray) => {
-      const newIndexes = [];
+      const updatedDisplayWord = [...displayWord];
       wordArray.forEach((char, index) => {
-        if (char === letter && !prevIndexArray.includes(index)) {
-          newIndexes.push(index);
+        if (char === letter) {
+          updatedDisplayWord[index] = letter;
         }
       });
-
-      const updatedIndexArray = [...prevIndexArray, ...newIndexes];
-
-      setDisplayWord((prevDisplayWord) => {
-        const newDisplayWord = [...prevDisplayWord];
-        newIndexes.forEach((index) => {
-          newDisplayWord[index] = letter;
-        });
-        return newDisplayWord;
-      });
-      if (updatedIndexArray.length === wordArray.length) {
+      setDisplayWord(updatedDisplayWord);
+      if (!updatedDisplayWord.includes('_')) {
         setWin(true);
+        showModal(true);
       }
-
-      return updatedIndexArray;
-    });
+    }
   };
 
   const restartGame = () => {
+    const newWord = words[Math.floor(Math.random() * words.length)];
+    setWord(newWord);
+    setWordArray(newWord.split(''));
+    setDisplayWord(Array(newWord.length).fill('_'));
     setTries(0);
     setWin(false);
-    setLetter('');
-    setIndexArray([]);
-    setWord(initialWord);
     showModal(false);
-    setDisplayWord(Array(initialWord.length).fill('_'));
-    setReset(true);
+    keyboardRef.current.resetKeyboard();
   };
 
   const getImageForTries = () => {
-    switch (tries) {
-      case 0:
-        return '0.png';
-      case 1:
-        return '1.png';
-      case 2:
-        return '2.png';
-      case 3:
-        return '3.png';
-      case 4:
-        return '4.png';
-      case 5:
-        return '5.png';
-      case 6:
-        return '6.png';
-      case 7:
-        return '7.png';
-      default:
-        return '0.png';
-    }
+    return `${tries}.png`;
   };
 
   return (
     <div className="App">
       <img className="image" src={getImageForTries()} alt={`Tries: ${tries}`} />
       <CharacterBoxes characters={displayWord} />
-      <Keyboard onLetterClick={handleLetterClick} reset={reset} />
+      <Keyboard onLetterClick={handleLetterClick} ref={keyboardRef} />
       {modal && (
         <Modal>
           <div className="modal-content">
