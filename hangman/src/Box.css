@@ -1,0 +1,23 @@
+.character-container {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  justify-content: center;
+  align-items: center;
+  position: absolute; 
+  bottom: 170px; 
+  left: 50%; 
+  transform: translateX(-50%); 
+}
+
+  
+  .character-box {
+    width: 40px;
+    height: 40px;
+    border: 1px solid black;
+    text-align: center;
+    line-height: 40px;
+    font-size: 20px;
+    background-color: lightgray;
+  }
+  
