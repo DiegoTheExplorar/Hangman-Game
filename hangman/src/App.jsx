@@ -1,4 +1,4 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import CharacterBoxes from './Box';
 import Keyboard from './Keyboard';
@@ -21,7 +21,21 @@ function App() {
   const [win, setWin] = useState(false);
   const [wordArray, setWordArray] = useState(word.split(''));
   const [displayWord, setDisplayWord] = useState(Array(word.length).fill('_'));
+  const [score, setScore] = useState(0);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [timer, setTimer] = useState(60); // 60 seconds timer
   const keyboardRef = useRef(null);
+
+  useEffect(() => {
+    if (timer > 0 && !modal) {
+      const interval = setInterval(() => {
+        setTimer(timer - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (timer === 0) {
+      showModal(true);
+    }
+  }, [timer, modal]);
 
   const handleLetterClick = (letter) => {
     if (!wordArray.includes(letter)) {
@@ -39,7 +53,19 @@ function App() {
       setDisplayWord(updatedDisplayWord);
       if (!updatedDisplayWord.includes('_')) {
         setWin(true);
+        setScore(prevScore => prevScore + 10); // Add 10 points for a win
         showModal(true);
+      }
+    }
+  };
+
+  const handleHintClick = () => {
+    if (!hintUsed) {
+      const remainingLetters = wordArray.filter((letter, index) => displayWord[index] === '_');
+      if (remainingLetters.length > 0) {
+        const hintLetter = remainingLetters[Math.floor(Math.random() * remainingLetters.length)];
+        handleLetterClick(hintLetter);
+        setHintUsed(true);
       }
     }
   };
@@ -52,22 +78,30 @@ function App() {
     setTries(0);
     setWin(false);
     showModal(false);
+    setHintUsed(false);
+    setTimer(60); // Reset timer
     keyboardRef.current.resetKeyboard();
   };
 
   const getImageForTries = () => {
-    return `${tries}.png`;
+    return `/${tries}.webp`;
   };
 
   return (
     <div className="App">
+      <h1>Guess the Word!</h1>
+      <div className="score-timer">
+        <div>Score: {score}</div>
+        <div>Time Left: {timer}s</div>
+      </div>
       <img className="image" src={getImageForTries()} alt={`Tries: ${tries}`} />
       <CharacterBoxes characters={displayWord} />
       <Keyboard onLetterClick={handleLetterClick} ref={keyboardRef} />
+      <button className="hint-button" onClick={handleHintClick} disabled={hintUsed}>Hint</button>
       {modal && (
         <Modal>
           <div className="modal-content">
-            {win ? 'Congratulations! You won!' : 'U freaking suck bruh!'}
+            <h2>{win ? 'Congratulations! You won!' : 'You Lost! Try Again!'}</h2>
             <button onClick={restartGame}>Restart</button>
           </div>
         </Modal>

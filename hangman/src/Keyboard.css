@@ -30,7 +30,7 @@
   background-color: #1976d2;
 }
 
-.letter-button:disabled {
+.letter-button.disabled {
   background-color: #d3d3d3;
   cursor: not-allowed;
 }

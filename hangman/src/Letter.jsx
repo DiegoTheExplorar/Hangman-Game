@@ -7,23 +7,10 @@ function Letter({ letter, onClick, disabled }) {
     }
   };
 
-  const buttonStyle = {
-    width: '100px',
-    height: '50px',
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: 'white',
-    backgroundColor: disabled ? 'grey' : 'green',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: 'background-color 0.3s',
-  };
-
   return (
     <button 
+      className={`letter-button ${disabled ? 'disabled' : ''}`} 
       onClick={handleClick} 
-      style={buttonStyle}
       disabled={disabled}
     >
       {letter}

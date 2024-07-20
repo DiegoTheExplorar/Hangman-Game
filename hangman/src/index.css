@@ -1,13 +1,14 @@
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  #root {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f9fc; /* Match the background of the app */
+  color: #333; /* Dark color for text */
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
