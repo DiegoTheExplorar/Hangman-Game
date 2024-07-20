@@ -4,7 +4,7 @@
 
 ### src\App.jsx
 ```jsx
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import './App.css';
 import CharacterBoxes from './Box';
 import Keyboard from './Keyboard';
@@ -27,7 +27,21 @@ function App() {
   const [win, setWin] = useState(false);
   const [wordArray, setWordArray] = useState(word.split(''));
   const [displayWord, setDisplayWord] = useState(Array(word.length).fill('_'));
+  const [score, setScore] = useState(0);
+  const [hintUsed, setHintUsed] = useState(false);
+  const [timer, setTimer] = useState(60); // 60 seconds timer
   const keyboardRef = useRef(null);
+
+  useEffect(() => {
+    if (timer > 0 && !modal) {
+      const interval = setInterval(() => {
+        setTimer(timer - 1);
+      }, 1000);
+      return () => clearInterval(interval);
+    } else if (timer === 0) {
+      showModal(true);
+    }
+  }, [timer, modal]);
 
   const handleLetterClick = (letter) => {
     if (!wordArray.includes(letter)) {
@@ -45,7 +59,19 @@ function App() {
       setDisplayWord(updatedDisplayWord);
       if (!updatedDisplayWord.includes('_')) {
         setWin(true);
+        setScore(prevScore => prevScore + 10); // Add 10 points for a win
         showModal(true);
+      }
+    }
+  };
+
+  const handleHintClick = () => {
+    if (!hintUsed) {
+      const remainingLetters = wordArray.filter((letter, index) => displayWord[index] === '_');
+      if (remainingLetters.length > 0) {
+        const hintLetter = remainingLetters[Math.floor(Math.random() * remainingLetters.length)];
+        handleLetterClick(hintLetter);
+        setHintUsed(true);
       }
     }
   };
@@ -58,22 +84,30 @@ function App() {
     setTries(0);
     setWin(false);
     showModal(false);
+    setHintUsed(false);
+    setTimer(60); // Reset timer
     keyboardRef.current.resetKeyboard();
   };
 
   const getImageForTries = () => {
-    return `${tries}.png`;
+    return `/${tries}.webp`;
   };
 
   return (
     <div className="App">
+      <h1>Guess the Word!</h1>
+      <div className="score-timer">
+        <div>Score: {score}</div>
+        <div>Time Left: {timer}s</div>
+      </div>
       <img className="image" src={getImageForTries()} alt={`Tries: ${tries}`} />
       <CharacterBoxes characters={displayWord} />
       <Keyboard onLetterClick={handleLetterClick} ref={keyboardRef} />
+      <button className="hint-button" onClick={handleHintClick} disabled={hintUsed}>Hint</button>
       {modal && (
         <Modal>
           <div className="modal-content">
-            {win ? 'Congratulations! You won!' : 'U freaking suck bruh!'}
+            <h2>{win ? 'Congratulations! You won!' : 'You Lost! Try Again!'}</h2>
             <button onClick={restartGame}>Restart</button>
           </div>
         </Modal>
@@ -163,23 +197,10 @@ function Letter({ letter, onClick, disabled }) {
     }
   };
 
-  const buttonStyle = {
-    width: '100px',
-    height: '50px',
-    fontSize: '20px',
-    fontWeight: 'bold',
-    color: 'white',
-    backgroundColor: disabled ? 'grey' : 'green',
-    border: 'none',
-    borderRadius: '5px',
-    cursor: disabled ? 'not-allowed' : 'pointer',
-    transition: 'background-color 0.3s',
-  };
-
   return (
     <button 
+      className={`letter-button ${disabled ? 'disabled' : ''}`} 
       onClick={handleClick} 
-      style={buttonStyle}
       disabled={disabled}
     >
       {letter}
@@ -193,15 +214,16 @@ export default Letter;
 
 ### src\main.jsx
 ```jsx
-import React from 'react'
-import ReactDOM from 'react-dom/client'
-import App from './App.jsx'
+import React from 'react';
+import ReactDOM from 'react-dom/client';
+import App from './App.jsx';
+import './index.css';
 
 ReactDOM.createRoot(document.getElementById('root')).render(
   <React.StrictMode>
     <App />
   </React.StrictMode>,
-)
+);
 
 ```
 
@@ -233,18 +255,50 @@ export default Modal;
   flex-direction: column;
   justify-content: center;
   align-items: center;
-  height: 100vh;
+  min-height: 100vh;
   text-align: center;
-  background-color: #e9ecef; /* Light background color for better contrast */
+  background-color: #f7f9fc; /* Light background color for better contrast */
   font-family: 'Arial', sans-serif; /* Add a clean, modern font */
+  color: #333; /* Dark color for text */
+  padding: 20px; /* Add padding to the sides */
+}
+
+h1 {
+  font-size: 2rem;
+  margin-bottom: 20px;
 }
 
 .image {
-  width: 200px; /* Set a consistent width for all images */
-  height: 200px; /* Set a consistent height for all images */
+  width: 250px; /* Increase the width */
+  height: 250px; /* Increase the height */
   margin-bottom: 20px;
   object-fit: cover; /* Ensure images cover the assigned space without distortion */
   border-radius: 10px; /* Optional: add rounded corners for images */
+  box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1); /* Add a subtle shadow */
+}
+
+.score-timer {
+  display: flex;
+  justify-content: space-between;
+  width: 100%;
+  max-width: 400px;
+  margin-bottom: 20px;
+}
+
+.hint-button {
+  margin-top: 20px;
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.hint-button:hover {
+  background-color: #0056b3;
 }
 
 .modal-content {
@@ -257,6 +311,49 @@ export default Modal;
   background-color: white; /* Ensure modal background is white */
 }
 
+.modal-content h2 {
+  margin-bottom: 20px;
+  font-size: 1.5rem;
+  color: #333;
+}
+
+.modal-content button {
+  padding: 10px 20px;
+  font-size: 1rem;
+  background-color: #007bff;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.modal-content button:hover {
+  background-color: #0056b3;
+}
+
+/* Responsive styles */
+@media (max-width: 768px) {
+  .App {
+    padding: 10px;
+  }
+
+  .image {
+    width: 200px; /* Adjust width for mobile */
+    height: 200px; /* Adjust height for mobile */
+  }
+
+  .score-timer {
+    flex-direction: column;
+    align-items: center;
+  }
+
+  .hint-button {
+    width: 100%;
+    max-width: 200px;
+  }
+}
+
 ```
 
 ### src\Box.css
@@ -267,10 +364,7 @@ export default Modal;
   gap: 10px;
   justify-content: center;
   align-items: center;
-  position: absolute;
-  bottom: 190px;
-  left: 50%;
-  transform: translateX(-50%);
+  margin-bottom: 20px;
 }
 
 .character-box {
@@ -297,23 +391,35 @@ export default Modal;
   color: white;
 }
 
+/* Responsive styles */
+@media (max-width: 768px) {
+  .character-box {
+    width: 30px;
+    height: 30px;
+    font-size: 18px;
+    line-height: 30px;
+  }
+}
+
 ```
 
 ### src\index.css
 ```css
 body {
-    margin: 0;
-    font-family: Arial, sans-serif;
-  }
-  
-  #root {
-    height: 100vh;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-  }
-  
+  margin: 0;
+  font-family: Arial, sans-serif;
+  background-color: #f7f9fc; /* Match the background of the app */
+  color: #333; /* Dark color for text */
+}
+
+#root {
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
 ```
 
 ### src\Keyboard.css
@@ -350,7 +456,7 @@ body {
   background-color: #1976d2;
 }
 
-.letter-button:disabled {
+.letter-button.disabled {
   background-color: #d3d3d3;
   cursor: not-allowed;
 }
@@ -382,7 +488,7 @@ body {
   width: 400px;
 }
 
-.modal-content h1 {
+.modal-content h2 {
   margin-bottom: 20px;
   font-size: 24px;
   color: #333;

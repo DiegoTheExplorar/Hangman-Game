@@ -94,10 +94,14 @@ function App() {
         <div>Score: {score}</div>
         <div>Time Left: {timer}s</div>
       </div>
-      <img className="image" src={getImageForTries()} alt={`Tries: ${tries}`} />
+      <div className="image-container">
+        <img className="image" src={getImageForTries()} alt={`Tries: ${tries}`} />
+        <button className="hint-button" onClick={handleHintClick} disabled={hintUsed}>
+          Hint
+        </button>
+      </div>
       <CharacterBoxes characters={displayWord} />
       <Keyboard onLetterClick={handleLetterClick} ref={keyboardRef} />
-      <button className="hint-button" onClick={handleHintClick} disabled={hintUsed}>Hint</button>
       {modal && (
         <Modal>
           <div className="modal-content">
