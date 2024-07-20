@@ -13,7 +13,7 @@ function App() {
   const [displayWord, setDisplayWord] = useState([]);
   const [score, setScore] = useState(0);
   const [hintUsed, setHintUsed] = useState(false);
-  const [timer, setTimer] = useState(60); // 60 seconds timer
+  const [timer, setTimer] = useState(60); 
   const keyboardRef = useRef(null);
 
   useEffect(() => {
@@ -25,7 +25,7 @@ function App() {
     fetch(apiUrl)
       .then(response => response.json())
       .then(data => {
-        const newWord = data[0].toUpperCase(); // Ensure the word is in uppercase
+        const newWord = data[0].toUpperCase(); 
         setWord(newWord);
         setWordArray(newWord.split(''));
         setDisplayWord(Array(newWord.length).fill('_'));
@@ -98,7 +98,7 @@ function App() {
       {modal && (
         <Modal>
           <div className="modal-content">
-            <h2>{win ? 'Congratulations! You won!' : 'You Lost bruh! You Suck! Try Again!'}</h2>
+            <h2>{win ? 'Congratulations! You won!' : 'You Lost! Try Again!'}</h2>
             <button onClick={restartGame}>Restart</button>
           </div>
         </Modal>
